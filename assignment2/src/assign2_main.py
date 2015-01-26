@@ -8,29 +8,22 @@ from neuralnetworkAux import *
 # handprinted digits recognition
 ##################################################
 def readFile(filename):
-    y = ""
+    y = []
     features = []
     with open(filename) as f:
-        s = ''
+        s = []
         for line in f:
-            if (re.search('[.]',line) != None):# not found
-                s += line.rstrip() + " "
+            if (re.search('[.]',line) != None):# found float
+                s += map(float,line.split())
             elif (re.search('-',line) != None):
                 ss = re.findall("[a-z]+|\d+",line) # split line into ["train","0","1"]
-                y +=(" " + ss[1])
-                if (s != ""):
-                    features.append(s)
-                    s = ''
+                y.append(int(ss[1]))
+            else:
+                features.append(s)
+                s = []
 
-    y = np.fromstring(y,dtype=int, sep=' ')
-    tols = y.size
-
-    l = features[0]
-    tolf = len(l.split())
-
-    x = np.empty([tols, tolf])
-    for i,l in enumerate(features):
-        x[i,:] = np.fromstring(l,sep=' ')
+    y = np.array(y)
+    x = np.array(features)
     return (x,y)
 
 ##########
@@ -53,10 +46,11 @@ def main():
     mask2 = np.zeros((tolnum,1))
     mask2[ind2] = 1.0
 
-    (w,_) = gradient_descent(X, mask2, alpha = 1.0, 
+    (w,errhis) = gradient_descent(X, mask2, alpha = 1.0, 
                             fun_eva = perceptron_learning,
                             batchsize = 1,
-                            maxiter = 20)
+                            maxiter = 200)
+    plt.show()
     res = classification(X,w)
     acc = compute_accuracy(res, mask2)
     print "train set accuracy %f" %acc
@@ -82,7 +76,6 @@ def main():
     tol0 = ind0.shape[0]
     tol8 = ind8.shape[0]
     tol08 = tol0 + tol8
-
 ## get label: class 0 -> label 1
 ##            class 8 -> label 0
 
@@ -140,8 +133,7 @@ def main():
 
 
 ## test set prediction
-    uy = np.unique(testy)
-    uynum = uy.size
+    tolnum = testy.shape[0]
     yy = np.zeros((tolnum,uynum))
     for i in xrange(tolnum):
         yy[i,testy[i]] = 1.0
