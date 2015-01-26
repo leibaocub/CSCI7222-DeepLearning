@@ -26,6 +26,16 @@ def readFile(filename):
     x = np.array(features)
     return (x,y)
 
+def class2label(X,Y, label1=None, label2=None):
+    if (label1 == None and label2 == None):
+        return (X,Y)
+    elif(label1 != None):
+        return (X,Y)
+    else:
+        return (X,Y)
+
+        
+
 ##########
 def main():
 #### read data    
@@ -63,7 +73,7 @@ def main():
     res = classification(testX,w)
     acc = compute_accuracy(res, mask2)
     print "test set accuracy %f" %acc
-    plot_confusionmatrix(mask2,res,['2','not 2'],'part2.eps')
+    plot_confusionmatrix(mask2,res,['2','not-2'],'part2.eps')
 
 ##########
 #### part 3
