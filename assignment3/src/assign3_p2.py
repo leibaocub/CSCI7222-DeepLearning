@@ -33,8 +33,9 @@ def main():
         testyy[i,testy[i]] = 1.0
 
     (w, errhis,errhistest) = logistic_neurons(X, yy, xtest = testX, ytest = testyy,
-                                        alpha = 0.02, theta = 0.5, 
-                                        maxiter = 100)
+                                        alpha = 0.05, theta = 0.5, 
+                                        maxiter = 200,
+                                        batchsize=20)
 
 #####for ploting cost function history
     fig1 = plt.figure(1)
@@ -56,6 +57,9 @@ def main():
     yp = multiclass_indicator(testX,w,fun=mytanh)
     acc = compute_accuracy(yp,testy)
     print "test set accuracy %f" %acc
+
+    plot_confusionmatrix(testy, yp, filename = "p2_cm.eps")
+    
 
 ####################
 if __name__ == "__main__":

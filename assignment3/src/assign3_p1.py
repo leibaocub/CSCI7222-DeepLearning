@@ -62,6 +62,9 @@ def main():
     yp = multiclass_indicator(testX,w,fun=mytanh)
     acc = compute_accuracy(yp,testy)
     print "test set accuracy %f" %acc
+
+    plot_confusionmatrix(testy, yp, filename = "p1_cm.eps")
+    
 ####################
 if __name__ == "__main__":
     main()
