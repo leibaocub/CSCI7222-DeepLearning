@@ -5,51 +5,10 @@
 import numpy as np
 import math
 import random
+from funset import *
 from numpy import linalg as LA
 from functools import partial
 
-###############
-## square error as cost function
-## mytanh as activation function
-###############
-def square_error(t,y):
-    delta = t - y
-    cost = 0.5 * np.vdot(delta,delta)
-    grad = - delta ## dC/dy
-    return (cost, grad)
-
-def mytanh(x,w):
-    net = np.dot(x,w)
-    y = 2.0/(1.0 + np.exp(-net)) - 1.0
-    grad = 0.5 * (1.0 + y) * (1.0 - y) ## element-wise
-    return (y, grad)
-
-def mysigmoid(x,w):
-    net = np.dot(x,w)
-    y = 1.0/(1.0 + np.exp(-net))
-    grad = y * (1.0 - y) ## element-wise
-    return (y, grad)
-###############
-## cross entropy as cost function
-## softmax as activation function
-###############
-def cross_entropy(t,y):
-    pr = np.log(y)
-    cost = -np.vdot(t,pr)
-## maybe need to compute derivative too
-    grad = - t/y ## elementwise
-    return (cost, grad)
-
-######
-## mysoftmax can only be output fun right now!!!
-def mysoftmax(x,w):
-    net = np.dot(x,w)
-    y = np.exp(net)
-    sumy = np.sum(y,axis=1)
-    y = y/sumy[:, np.newaxis]
-## maybe need to compute derivative too
-    grad = y - y * y ## only for the diagonal part
-    return (y,grad)
 
 ###############
 ## wrapper for composite cost function and activation function
@@ -66,6 +25,8 @@ def myfun_fdz(cost_fun, active_fun, w, x, y):
 ###############
 ## wrapper for cross entropy and softmax,
 ## dC/dnet is just (z-y)
+## cross entropy as cost function
+## softmax as activation function
 ###############
 def myfun_default_fdz(w, x, y):
     z = mysoftmax(x,w)[0]
@@ -79,6 +40,7 @@ def myfun_default_fdz(w, x, y):
 ## wrapper for cross entropy and softmax,
 ## dC/dnet is just (z-y)
 ###############
+
 ###############
 ## initialize weight for neural network
 ###############
@@ -88,6 +50,9 @@ def nn_initialw(m,n,epsilon=1.0):
     w = 2.0 * w/l1 ### normalize
     return w
 
+###############
+## initialize label for y
+###############
 def nn_labely(y, outputfun, cost_fun):
     tolnum = y.size
     uy = np.unique(y)
@@ -125,8 +90,11 @@ def nn_labely(y, outputfun, cost_fun):
 
     return yy
     
-#####
 
+###############
+## train network given xin and yin
+## update: layers
+###############
 
 def train_network(layers, xin, yin, hidden_fun, hidden2output, alpha, theta):
     ### forward feeding
@@ -156,7 +124,7 @@ def train_network(layers, xin, yin, hidden_fun, hidden2output, alpha, theta):
         gradz = layers[li+1]['gradz']
         grada = np.dot(gradz, w[1:].T) ## ignor bias term
         ### for next layer
-        layers[li]['gradz'] = grada * fz
+        layers[li]['gradz'] = grada * fz ## elementwise
 
     ### forward updating weights
     for layer in layers:
@@ -168,11 +136,14 @@ def train_network(layers, xin, yin, hidden_fun, hidden2output, alpha, theta):
         try:
             layer['deltaw'] =  theta * layer['deltaw'] - (1.0 - theta) * alpha * gradw
         except KeyError:
-            layer['deltaw'] =  - alpha * gradw
+            layer['deltaw'] =  - alpha * gradw ## first sweep, take full learningrate
 
         layer['w'] = layer['w'] + layer['deltaw']
 
 
+####################
+# neural network: predict most active neurons
+###################
 def nn_predict(w,x,output_fun = mysoftmax,hidden_fun = mysigmoid):
     numl = len(w)
     yhidden = x
@@ -187,14 +158,13 @@ def nn_predict(w,x,output_fun = mysoftmax,hidden_fun = mysigmoid):
     
     return labels
 
-
 ####################
-# neural network
+# neural network: main body
 ####################
 def neural_network(x, yy, alpha=1.0, theta = 0.0, maxiter = 1000, 
                 tol = 1e-5, 
                 cost_fun = cross_entropy,
-                output_fun = mysigmoid,
+                output_fun = mysoftmax,
                 hidden_fun = mysigmoid,
                 hidden_units = [8],
                 batchsize = None):
@@ -269,6 +239,9 @@ def neural_network(x, yy, alpha=1.0, theta = 0.0, maxiter = 1000,
         if ( cost < tol):
             break## happy w/ cost 
 
+#####
+# normalize error
+#####
     if (cost_fun == square_error):
         yvar = np.mean(y, axis=0)
         yvarsum = np.sum((y - yvar) * (y - yvar))
@@ -277,5 +250,8 @@ def neural_network(x, yy, alpha=1.0, theta = 0.0, maxiter = 1000,
         num = 1.0/float(x.shape[0])
         errhis = map(lambda x: x * num, errhis)
 
+#####
+# retrieve weights from layers for output
+#####
     w = [d['w'] for d in layers]
     return (w, errhis)
