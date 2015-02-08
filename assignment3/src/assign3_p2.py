@@ -1,6 +1,6 @@
  #!/usr/bin/python
 import numpy as np
-from neuralnetwork import *
+from neuronlearning import *
 from postprocess import *
 
 ##################################################

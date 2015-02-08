@@ -1,7 +1,7 @@
  #!/usr/bin/python
 import re
 import numpy as np
-from neuralnetwork import *
+from neuronlearning import *
 from postprocess import *
 
 ##########

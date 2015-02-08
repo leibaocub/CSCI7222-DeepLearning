@@ -18,16 +18,14 @@ def main():
 #    testX = np.insert(testx,0,1,axis=1) # add 1 at the fist column to handle bias term
 
 
-    output_fun = mysigmoid ## mysigmoid, mysoftmax
+    output_fun = mysoftmax ## mysigmoid, mysoftmax
     hidden_fun = mysigmoid # mytanh
-    cost_fun = square_error
-    (w, errhis) = neural_network(x,y,alpha = 0.003, theta = 0.0, 
-                                maxiter = 1000, cost_fun = cost_fun,
+    cost_fun = cross_entropy
+    (w, errhis) = neural_network(x,y,alpha = 0.002, theta = 0.2, 
+                                maxiter = 500, cost_fun = cost_fun,
                                 hidden_fun = hidden_fun,
-                                hidden_units = [20, 15],
+                                hidden_units = [20, 10],
                                 output_fun = output_fun)
-    print errhis[-1]
-
 #####for ploting cost function history
     fig1 = plt.figure(1)
     iters = np.arange(1,len(errhis)+1)
