@@ -4,3 +4,7 @@ rep for CSSI 7222 Neural Network python src code
 finish assignment1 for constructing lms and perceptron learning rule
 2 01/25/2015
 finish assignment2 for handwriting recognition
+3 02/07/2015
+finish assignment3. Include logistic neurons, softmax + cross entropy and multilayer neural network.
+First 2 obtain ~93% for traing set and ~85% for test set.
+Third one, the defult option has ~95% for training set and ~85% for test set.
