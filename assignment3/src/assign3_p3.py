@@ -21,11 +21,12 @@ def main():
     output_fun = mysoftmax ## mysigmoid, mysoftmax
     hidden_fun = mysigmoid # mytanh
     cost_fun = cross_entropy
-    (w, errhis) = neural_network(x,y,alpha = 0.002, theta = 0.2, 
-                                maxiter = 500, cost_fun = cost_fun,
+    (w, errhis) = neural_network(x,y,alpha = 0.05, theta = 0.5, 
+                                maxiter = 100, cost_fun = cost_fun,
                                 hidden_fun = hidden_fun,
                                 hidden_units = [20, 10],
-                                output_fun = output_fun)
+                                output_fun = output_fun,
+                                batchsize=20)
 #####for ploting cost function history
     fig1 = plt.figure(1)
     iters = np.arange(1,len(errhis)+1)
@@ -45,6 +46,7 @@ def main():
     acc = compute_accuracy(yp, testy)
     print "test set accuracy %f" %acc
 
+    plot_confusionmatrix(testy, yp, filename = "p3_cm.eps")
 ####################
 if __name__ == "__main__":
     main()
